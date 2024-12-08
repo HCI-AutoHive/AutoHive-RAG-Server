@@ -17,7 +17,7 @@ print("\n\nHCI_data_dataset 파일 읽기 완료")
 documents = [
     Document(
         page_content=f"Review: {row['review']} | Perform: {row['perform']} | Safety: {row['safety']}", 
-        metadata={"Title": row['Title']}     
+        metadata={"Title": row['Title']}  
     )
     for _, row in df.iterrows()
 ]
@@ -44,6 +44,6 @@ faiss_db = add_documents_to_faiss(documents, us_model)
 print("FAISS DB에 문서 임베딩 및 저장 완료") 
 
 # FAISS 저장 경로 지정 및 저장
-faiss_db_path = "app/vector_databases/HCI_data_faiss"
+faiss_db_path = "app/vector_databases/chian_faiss_index"
 faiss_db.save_local(faiss_db_path)
 print(f"FAISS 데이터베이스가 '{faiss_db_path}' 경로에 저장되었습니다.")
