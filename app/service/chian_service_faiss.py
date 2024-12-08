@@ -5,13 +5,13 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.memory import ConversationBufferMemory
-from config import GEMINI_API_KEY, DRIVE_JUDGE_PROMPT_TEMPLATE, UPSTAGE_API_KEY
+from config import GEMINI_API_KEY, UPSTAGE_API_KEY, CAR_REVIEW_PROMPT_TEMPLATE
 
 # Upstage 임베딩 모델 설정
 us_model = UpstageEmbeddings(api_key=UPSTAGE_API_KEY, model="solar-embedding-1-large")
 
 # FAISS DB 경로 설정
-faiss_db_path = "./app/vector_databases/faiss_db/drive_judge_dataset_faiss"
+faiss_db_path = "./app/vector_databases/chian_faiss_index"
 
 # 기존 FAISS 벡터 스토어 로드
 try:
@@ -25,7 +25,7 @@ except Exception as e:
 retriever = faiss_db.as_retriever(search_type='similarity', search_kwargs={'k': 3})
 
 # 프롬프트 템플릿 정의
-prompt = ChatPromptTemplate.from_template(DRIVE_JUDGE_PROMPT_TEMPLATE)
+prompt = ChatPromptTemplate.from_template(CAR_REVIEW_PROMPT_TEMPLATE)
 
 # 언어 모델 설정
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0, api_key=GEMINI_API_KEY)
@@ -39,7 +39,7 @@ def merge_context(pages, conversation_history):
     return f"Previous Conversation:\n{conversation_history}\n\nRetrieved Documents:\n{merged_pages}"
 
 
-def analyze_drive_judge(query):
+def analyze_chian(query):
     # 이전 대화 내용 로드
     conversation_history = "\n".join([msg.content for msg in memory.load_memory_variables({}).get("chat_history", [])])
 
@@ -59,7 +59,7 @@ def analyze_drive_judge(query):
         answer = chain.invoke(query)
         memory.save_context({"query": query}, {"response": answer})
     except Exception as e:
-        print(f"Error generating response: {str(e)}")  # 에러 로깅
+        print(f"Error generating response: {str(e)}") 
         answer = "응답 생성 중 오류가 발생했습니다."
 
     return answer
